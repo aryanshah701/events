@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Events · Phoenix Framework</title>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/>
+    <script defer type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
+  </head>
+  <body>
+    <div role="main" class="container py-5">
+      <div class="container">
+        <div classs="row">
+          <ul class="nav nav-pills">
+            <%= if @conn.assigns[:user] do %>
+              <li class="nav-item">
+                  <%= 
+                    link(@conn.assigns[:user].name, 
+                    class: "nav-link text-capitalize", 
+                    to: Routes.user_path(@conn, :show, @conn.assigns[:user])) 
+                  %>
+              </li>
+              <li class="nav-item">
+                  <%= 
+                    link("Logout", 
+                    class: "nav-link", 
+                    to: Routes.session_path(@conn, :delete), 
+                    method: :delete) 
+                  %>
+              </li>
+            <% else %>
+              <li class="nav-item">
+                <%= 
+                  link("Login", class: "nav-link", 
+                  to: Routes.page_path(@conn, :login), 
+                  method: :get) 
+                %>
+              </li>
+              <li class="nav-item">
+                <%= link("Register", 
+                  class: "nav-link", 
+                  to: Routes.user_path(@conn, :new), 
+                  method: "get") 
+                %>
+              </li>
+            <% end %>
+            <li class="nav-item">
+              <%= link("Events", 
+                class: "nav-link", 
+                to: Routes.page_path(@conn, :index),
+                 method: :get) 
+              %>
+            </li>
+          </ul>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <%= #Below conditional show of flash taken from Tuck notes 0223 %>
+            <%= if get_flash(@conn, :error) do %>
+              <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
+            <% end %>
+            <%= if get_flash(@conn, :info) do %>
+              <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <%= @inner_content %>
+          </div>
+        </div>
+      </div>
+    </div>
+      
+  </body>
+</html>

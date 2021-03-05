@@ -1,0 +1,33 @@
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <h1>Events</h1>
+    </div>
+  </div>
+  <div class="row">
+    <%= for event <- @events do %>
+      <div class="card m-2" style="width: 18rem;">
+        <div class="card-body">
+          <h5 class="card-title text-capitalize"><%= event.name %></h5>
+          <p class="mb-2 fs-6 text-muted"><%= event.date %></p>
+          <p class="card-text"><%= event.description %></p>
+          <span class="mx-1"><%= link "Show", to: Routes.event_path(@conn, :show, event) %></span>
+          <span class="mx-1"><%= link "Edit", to: Routes.event_path(@conn, :edit, event) %></span>
+          <span class="mx-1">
+            <%= 
+              link "Delete", 
+              to: Routes.event_path(@conn, :delete, event), 
+              method: :delete, 
+              data: [confirm: "Are you sure?"] 
+            %>
+          </span>
+        </div>
+      </div>
+    <% end %>
+  </div>
+  <div class="row">
+    <div class="col m-4">
+      <%= link "New Event", to: Routes.event_path(@conn, :new) %>
+    </div>
+  </div>
+</div>
