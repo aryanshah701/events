@@ -6,6 +6,7 @@ defmodule Events.Repo.Migrations.CreateEvents do
       add :name, :string, null: false
       add :date, :naive_datetime, null: false
       add :description, :string, null: false, default: ""
+      add :user_id, references(:users), null: false
 
       timestamps()
     end

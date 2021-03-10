@@ -15,14 +15,13 @@
         <%= label f, :description, for: "description", class: "form-label" %>
         <%= textarea f, :description, id: "description", class: "form-control"  %>
     </div>
-    <%= error_tag f, :name %>
+    <%= error_tag f, :description %>
 
     <div class="mb-3"> 
-    <%# <input type="text" name="date" id="date" value="01/01/2021" /> %>
       <%= label f, :date, for: "date", class: "form-label" %>
       <%= text_input f, :date, id: "date", value: "2021/01/01 5:00 PM" %>
     </div>
-    <%= error_tag f, :name %>
+    <%= error_tag f, :date %>
 
     <div>
       <%= submit "Save", type: "submit", class: "btn btn-primary" %>
@@ -36,7 +35,8 @@ $(function() {
     timePicker: true,
     singleDatePicker: true,
     showDropdowns: true,
-    minYear: parseInt(moment().format('YYYY', 10)),
+    minDate: '2021/01/01 12:00 A',
+    minYear: '2021',
     locale: {
       format: 'YYYY/MM/DD hh:mm A'
     }

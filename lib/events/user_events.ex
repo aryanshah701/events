@@ -37,6 +37,8 @@ defmodule Events.UserEvents do
   """
   def get_event!(id), do: Repo.get!(Event, id)
 
+  def get_event(id), do: Repo.get(Event, id)
+
   @doc """
   Creates a event.
 

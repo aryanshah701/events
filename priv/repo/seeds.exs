@@ -15,15 +15,15 @@ alias Events.Users.User
 alias Events.UserEvents.Event
 
 # Seeding users
-Repo.insert!(%User{
+user1 = Repo.insert!(%User{
   name: "user1", email: "user1@gmail.com"
 })
 
-Repo.insert!(%User{
+user2 = Repo.insert!(%User{
   name: "user2", email: "user2@gmail.com"
 })
 
-Repo.insert!(%User{
+user3 = Repo.insert!(%User{
   name: "user3", email: "user3@gmail.com"
 })
 
@@ -36,19 +36,22 @@ Repo.insert!(%User{
 event1 = %Event{
   name: "Event 1",
   description: "This is the first event's description",
-  date: datetime1
+  date: datetime1,
+  user_id: user1.id,
 }
 
 event2 = %Event{
   name: "Event 2",
   description: "This is the second event's description",
-  date: datetime2
+  date: datetime2,
+  user_id: user2.id,
 }
 
 event3 = %Event{
   name: "Event 3",
   description: "This is the third event's description",
-  date: datetime3
+  date: datetime3,
+  user_id: user3.id,
 }
 
 Repo.insert!(event1)

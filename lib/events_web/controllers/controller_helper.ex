@@ -1,7 +1,12 @@
 defmodule EventsWeb.ControllerHelpers do
   def format_event_params(event_params) do 
-    new_params = %{event_params | "date" => parse_datetime(event_params["date"]) }
-    IO.inspect new_params
+    new_params = Map.replace(event_params, "date", parse_datetime(event_params["date"]))
+    new_params
+  end
+
+  def add_user(event_params, user) do
+    IO.inspect user
+    new_params = Map.put(event_params, "user_id", user.id)
     new_params
   end
 

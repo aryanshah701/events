@@ -6,6 +6,7 @@ defmodule Events.UserEvents.Event do
     field :date, :naive_datetime
     field :description, :string
     field :name, :string
+    belongs_to :user, Events.Users.User
 
     timestamps()
   end
@@ -13,21 +14,25 @@ defmodule Events.UserEvents.Event do
   @doc false
   def changeset(event, attrs) do
     event
-    |> cast(attrs, [:name, :date, :description])
-    |> validate_required([:name, :date, :description])
-    |> validate_date()
+    |> cast(attrs, [:name, :date, :description, :user_id])
+    |> validate_required([:name, :date, :description, :user_id])
+    |> validate_date(:date)
   end
 
-  # Ensuring the event's date and time is greater than the current date time
-  def validate_date(changeset) do
-    date = get_field(changeset, :date)
+  # Design for custom changeset taken from 
+  # https://medium.com/@QuantLayer/writing-custom-validations-for-ecto-changesets-4971881c7684
+  
+  # Ensures the datetime chosen is sometime in the future
+  def validate_date(changeset, field, options \\ []) do
     current_datetime = NaiveDateTime.utc_now()
 
-    if NaiveDateTime.compare(current_datetime, date) == :gt do
-      add_error(changeset, :date, "cannot be prior to the current date and time")
-    else
-      changeset
-    end
+    validate_change(changeset, field, fn _, date ->
+      if date != nil && NaiveDateTime.compare(current_datetime, date) == :gt do
+        [{field, options[:message] || "Invalid date and time"}]
+      else
+        []
+      end
+    end)
   end
 
 end

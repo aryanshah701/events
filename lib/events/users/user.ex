@@ -5,6 +5,7 @@ defmodule Events.Users.User do
   schema "users" do
     field :email, :string
     field :name, :string
+    has_many :events, Events.UserEvents.Event
 
     timestamps()
   end
