@@ -31,8 +31,11 @@
     <tr>
       <td><%= comment.content %></td>
       <td><%= get_user_name(comment.user_id) %></td>
-      <%= if comment.user_id == @conn.assigns[:user].id do %>
+      <%= if comment.user_id == @conn.assigns[:user].id || @event.user_id == @conn.assigns[:user].id do %>
         <td><span><%= link "Edit", to: Routes.comment_path(@conn, :edit, comment) %></span></td>
+      <% end %>
+
+      <%= if comment.user_id == @conn.assigns[:user].id do %>
         <td><span><%= link "Delete", to: Routes.comment_path(@conn, :delete, comment), method: :delete, data: [confirm: "Are you sure?"] %></span></td>
       <% end %>
     </tr>

@@ -1,6 +1,6 @@
 # Plug that adds the current comment onto the connection
 # Implemented using the Phoenix Docs: https://hexdocs.pm/phoenix/plug.html
-defmodule EventsWeb.Plugs.AddEvent do 
+defmodule EventsWeb.Plugs.AddComment do 
   import Plug.Conn
 
   alias Events.Comments

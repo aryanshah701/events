@@ -3,6 +3,7 @@ defmodule EventsWeb.CommentController do
 
   alias Events.Comments
   alias Events.Comments.Comment
+  alias EventsWeb.Plugs
 
   # Comments can be created, edited, shown, and deleted only by logged in users
   plug Plugs.RequireLoggedIn, "en" when action in [:new, :create, :show, :edit, :update, :delete]
@@ -10,17 +11,14 @@ defmodule EventsWeb.CommentController do
   # Add the comment onto the connection so that the next few plugs have access to the event
   plug Plugs.AddComment, "en" when action in [:edit, :update, :delete, :show]
 
-  # # Add the event onto the connection so that the next few plugs have access to the event
-  # plug Plugs.AddEvent, "en" when action in [:edit, :update, :delete, :show]
+  # Add the event onto the connection so that the next few plugs have access to the event
+  plug Plugs.AddEvent, "en" when action in [:edit, :update, :delete, :show]
 
-  # # Comments can be deleted by the owner of the event and the owner of the comment
-  # plug Plugs.RequireSomeOwner, "en" when action in [:delete]
+  # Comments can be deleted by the owner of the event and the owner of the comment
+  plug Plugs.RequireSomeOwner, "en" when action in [:delete]
 
-  # # Comments can be editing by the owner of the comment only
-  # plug Plugs.RequireCommentOwner, "en" when action in [:edit, :update]
-
-  # # Comments can only be shown to the owner of the event, and invitees 
-  # plug Plugs.RequireOwnerInvite, "en" when action in [:show]
+  # Comments can be editing by the owner of the comment only
+  plug Plugs.RequireCommentOwner, "en" when action in [:edit, :update]
 
   def index(conn, _params) do
     comments = Comments.list_comments()
@@ -64,12 +62,13 @@ defmodule EventsWeb.CommentController do
 
   def update(conn, %{"id" => id, "comment" => comment_params}) do
     comment = Comments.get_comment!(id)
+    event = comment.event
 
     case Comments.update_comment(comment, comment_params) do
       {:ok, comment} ->
         conn
         |> put_flash(:info, "Comment updated successfully.")
-        |> redirect(to: Routes.comment_path(conn, :show, comment))
+        |> redirect(to: Routes.event_path(conn, :show, event))
 
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "edit.html", comment: comment, changeset: changeset)
@@ -78,10 +77,11 @@ defmodule EventsWeb.CommentController do
 
   def delete(conn, %{"id" => id}) do
     comment = Comments.get_comment!(id)
+    event = comment.event
     {:ok, _comment} = Comments.delete_comment(comment)
 
     conn
     |> put_flash(:info, "Comment deleted successfully.")
-    |> redirect(to: Routes.comment_path(conn, :index))
+    |> redirect(to: Routes.event_path(conn, :show, event))
   end
 end

@@ -13,6 +13,8 @@ defmodule EventsWeb.Plugs.RequireOwnerInvite do
     if logged_in_user_id == owner_user_id do
       conn
     else
+      IO.puts logged_in_user_id
+      IO.puts owner_user_id
       conn
       |> Phoenix.Controller.put_flash(:error, "Sorry you aren't the owner or invite of the event!")
       |> Phoenix.Controller.redirect(to: EventsWeb.Router.Helpers.page_path(conn, :index))

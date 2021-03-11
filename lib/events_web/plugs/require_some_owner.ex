@@ -7,14 +7,24 @@ defmodule EventsWeb.Plugs.RequireSomeOwner do
 
   def call(conn, _default) do
     # Check if current user is the owner of the event or the comment 
-    logged_in_user_id = conn.assigns[:user].id
-    event = conn.assigns[:event]
-    owner_user_id = event.user_id
-    comment_owner_user_id = conn.assigns[:comment].user_id
+    comment = conn.assigns[:comment]
+    event = comment.event
 
-    if logged_in_user_id == owner_user_id || 
-      logged_in_user_id == comment_owner_user_id  do
-      conn
+    if event && comment do 
+      logged_in_user_id = conn.assigns[:user].id
+      owner_user_id = event.user_id
+      comment_owner_user_id = comment.user_id
+
+      if logged_in_user_id == owner_user_id || 
+        logged_in_user_id == comment_owner_user_id  do
+        conn
+      else
+        conn
+        |> Phoenix.Controller.put_flash(:error, "Sorry you can't delete this comment")
+        |> Phoenix.Controller.redirect(to: 
+          EventsWeb.Router.Helpers.event_path(conn, :show, event))
+        |> halt()
+      end
     else
       conn
       |> Phoenix.Controller.put_flash(:error, "Sorry you can't delete this comment")

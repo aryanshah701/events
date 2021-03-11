@@ -1,4 +1,4 @@
-# Plug that ensures that the user is the owner of the event
+# Plug that ensures that the user is the owner of the comment
 # Implemented using the Phoenix Docs: https://hexdocs.pm/phoenix/plug.html
 defmodule EventsWeb.Plugs.RequireCommentOwner do 
   import Plug.Conn

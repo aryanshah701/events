@@ -37,7 +37,9 @@ defmodule Events.Comments do
   """
   def get_comment!(id) do
     comment = Repo.get!(Comment, id)
-    comment = Repo.preload(comment, :user)
+    |> Repo.preload(:user)
+    |> Repo.preload(:event)
+    
     comment
   end
 
