@@ -8,6 +8,7 @@ defmodule Events.UserEvents.Event do
     field :name, :string
     belongs_to :user, Events.Users.User
     has_many :comments, Events.Comments.Comment
+    has_many :invites, Events.Invites.Invite
 
     timestamps()
   end
