@@ -1,11 +1,6 @@
-<h1>Show Event</h1>
+<h1><%= @event.name %></h1>
 
 <ul>
-
-  <li>
-    <strong>Name:</strong>
-    <%= @event.name %>
-  </li>
 
   <li>
     <strong>Date:</strong>
@@ -19,5 +14,29 @@
 
 </ul>
 
-<span><%= link "Edit", to: Routes.event_path(@conn, :edit, @event) %></span>
+<%= if @conn.assigns[:user].id == @event.user_id do %>
+  <span><%= link "Edit Event", to: Routes.event_path(@conn, :edit, @event) %></span>
+<% end %>
+
+<h2>Comments</h2>
+<%= render(
+  EventsWeb.CommentView,
+  "form.html",
+  changeset: @new_comment,
+  action: Routes.comment_path(@conn, :create)
+) %>
+
+<table class="mt-5 table table-hover">
+<%= for comment <- @event.comments do %>
+    <tr>
+      <td><%= comment.content %></td>
+      <td><%= get_user_name(comment.user_id) %></td>
+      <%= if comment.user_id == @conn.assigns[:user].id do %>
+        <td><span><%= link "Edit", to: Routes.comment_path(@conn, :edit, comment) %></span></td>
+        <td><span><%= link "Delete", to: Routes.comment_path(@conn, :delete, comment), method: :delete, data: [confirm: "Are you sure?"] %></span></td>
+      <% end %>
+    </tr>
+<% end %>
+</table>
+
 <span><%= link "Back", to: Routes.page_path(@conn, :index) %></span>

@@ -51,7 +51,15 @@ defmodule EventsWeb.EventController do
 
   def show(conn, %{"id" => id}) do
     event = UserEvents.get_event!(id)
-    render(conn, "show.html", event: event)
+
+    # Creation of a comment change set taken from Tuck notes 0302 post_controller.ex
+    comment = %Events.Comments.Comment{
+      event_id: id,
+      user_id: conn.assigns[:user].id,
+    }
+    comment_changeset = Events.Comments.change_comment(comment)
+
+    render(conn, "show.html", event: event, new_comment: comment_changeset)
   end
 
   def edit(conn, %{"id" => id}) do

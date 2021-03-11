@@ -7,6 +7,7 @@ defmodule Events.UserEvents.Event do
     field :description, :string
     field :name, :string
     belongs_to :user, Events.Users.User
+    has_many :comments, Events.Comments.Comment
 
     timestamps()
   end
@@ -21,7 +22,7 @@ defmodule Events.UserEvents.Event do
 
   # Design for custom changeset taken from 
   # https://medium.com/@QuantLayer/writing-custom-validations-for-ecto-changesets-4971881c7684
-  
+
   # Ensures the datetime chosen is sometime in the future
   def validate_date(changeset, field, options \\ []) do
     current_datetime = NaiveDateTime.utc_now()

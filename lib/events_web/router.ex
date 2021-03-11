@@ -21,6 +21,7 @@ defmodule EventsWeb.Router do
     get "/login", PageController, :login
     resources "/users", UserController
     resources "/events", EventController
+    resources "/comments", CommentController
 
     # Bellow session routing taken from Tuck notes 0302
     resources "/sessions", SessionController, only: [:create, :delete], singleton: true

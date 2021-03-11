@@ -17,7 +17,7 @@ defmodule EventsWeb.UserController do
   def create(conn, %{"user" => user_params}) do
     # Create the user and send him/her to login page
     case Users.create_user(user_params) do
-      {:ok, user} ->
+      {:ok, _user} ->
         conn
         |> put_flash(:info, "You have been registered!")
         |> redirect(to: Routes.page_path(conn, :login))
