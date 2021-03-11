@@ -1,4 +1,4 @@
-# Plug that ensures a user is logged in
+# Plug that ensures the user is the owner of the event
 # Implemented using the Phoenix Docs: https://hexdocs.pm/phoenix/plug.html
 defmodule EventsWeb.Plugs.RequireOwner do 
   import Plug.Conn
