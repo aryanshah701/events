@@ -52,7 +52,17 @@ defmodule Events.Invites do
   def create_invite(attrs \\ %{}) do
     %Invite{}
     |> Invite.changeset(attrs)
-    |> Repo.insert()
+    |> Repo.insert(
+      on_conflict: :replace_all,
+      conflict_target: [:user_email, :event_id]
+    )
+    
+  end
+
+  def load_invite(%Invite{} = invite) do
+    invite = Repo.preload(invite, :event)
+    event = Events.UserEvents.load_stats(invite.event)
+    %{invite | event: event}
   end
 
   @doc """

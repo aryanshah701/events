@@ -13,10 +13,18 @@ defmodule EventsWeb.Plugs.AddUser do
 
     # If the user is logged in add current user, else nil
     if user_id do
+      # Create a token for the user
+      token = Phoenix.Token.sign(conn, "user_id", user_id)
+
       # Get the user from the id
       user = Users.get_user(user_id)
-      assign(conn, :user, user)
+
+      # Add token and user to the conn
+      conn
+      |> assign(:user, user)
+      |> assign(:user_token, token)
     else
+      IO.puts "NO USER"
       assign(conn, :user, nil)
     end
 

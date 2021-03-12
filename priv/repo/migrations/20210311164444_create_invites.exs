@@ -4,11 +4,13 @@ defmodule Events.Repo.Migrations.CreateInvites do
   def change do
     create table(:invites) do
       add :response, :string
-      add :user_id, references(:users), null: false
+      add :user_email, :string, null: false
       add :event_id, references(:events), null: false
 
       timestamps()
     end
 
+    # Invites are unique
+    create unique_index(:invites, [:user_email, :event_id], name: :unique_idx)
   end
 end

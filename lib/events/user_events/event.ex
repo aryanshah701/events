@@ -3,9 +3,17 @@ defmodule Events.UserEvents.Event do
   import Ecto.Changeset
 
   schema "events" do
+    # Field
     field :date, :naive_datetime
     field :description, :string
     field :name, :string
+    field :num_invites, :integer, virtual: true
+    field :num_yes, :integer, virtual: true
+    field :num_no, :integer, virtual: true
+    field :num_maybe, :integer, virtual: true
+    field :num_no_response, :integer, virtual: true
+
+    # Associations
     belongs_to :user, Events.Users.User
     has_many :comments, Events.Comments.Comment
     has_many :invites, Events.Invites.Invite

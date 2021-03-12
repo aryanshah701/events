@@ -48,9 +48,40 @@ defmodule Events.UserEvents do
       # Preload events
       event = event 
       |> Repo.preload(:comments)
+      |> Repo.preload(:invites)
 
       event  
     end
+  end
+
+  # Load the stats of the event(invites, yes, no etc)
+  def load_stats(%Event{} = event) do
+    event = Repo.preload(event, :invites)
+
+    # Compute the count of each response
+    yes_responses = Enum.filter(event.invites, fn invite -> invite.response == "yes" end)
+    no_responses = Enum.filter(event.invites, fn invite -> invite.response == "no" end)
+    maybe_responses = Enum.filter(event.invites, fn invite -> invite.response == "maybe" end)
+    no_response_responses = Enum.reject(event.invites, 
+      fn invite -> 
+        invite.response == "yes" || 
+          invite.response == "no" || 
+          invite.response == "maybe" 
+      end)
+
+    num_invites = Enum.count(event.invites)
+    num_yes = Enum.count(yes_responses)
+    num_no = Enum.count(no_responses)
+    num_maybe = Enum.count(maybe_responses)
+    num_no_response = Enum.count(no_response_responses)
+
+    event = Map.replace(event, :num_invites, num_invites)
+    event = Map.replace(event, :num_yes, num_yes)
+    event = Map.replace(event, :num_no, num_no)
+    event = Map.replace(event, :num_maybe, num_maybe)
+    event = Map.replace(event, :num_no_response, num_no_response)
+
+    event
   end
 
   @doc """

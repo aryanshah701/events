@@ -12,6 +12,7 @@ defmodule EventsWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug EventsWeb.Plugs.RequireAuth
   end
 
   scope "/", EventsWeb do

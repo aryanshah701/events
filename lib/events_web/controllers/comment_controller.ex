@@ -65,7 +65,7 @@ defmodule EventsWeb.CommentController do
     event = comment.event
 
     case Comments.update_comment(comment, comment_params) do
-      {:ok, comment} ->
+      {:ok, _comment} ->
         conn
         |> put_flash(:info, "Comment updated successfully.")
         |> redirect(to: Routes.event_path(conn, :show, event))

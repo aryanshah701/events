@@ -7,17 +7,20 @@ defmodule EventsWeb.Plugs.RequireOwnerInvite do
 
   def call(conn, _default) do
     # Check if user is the owner or an invite
-    logged_in_user_id = conn.assigns[:user].id
-    owner_user_id = conn.assigns[:event].user_id
+    event = conn.assigns[:event]
+    logged_in_user = conn.assigns[:user]
 
-    if logged_in_user_id == owner_user_id do
+    logged_in_user_id = logged_in_user.id
+    owner_user_id = event.user_id
+    invites = Enum.filter(event.invites, 
+      fn invite -> invite.user_email == logged_in_user.email end)
+
+    if logged_in_user_id == owner_user_id || Enum.count(invites) == 1 do
       conn
     else
-      IO.puts logged_in_user_id
-      IO.puts owner_user_id
       conn
       |> Phoenix.Controller.put_flash(:error, "Sorry you aren't the owner or invite of the event!")
-      |> Phoenix.Controller.redirect(to: EventsWeb.Router.Helpers.page_path(conn, :index))
+      |> Phoenix.Controller.redirect(to: EventsWeb.Router.Helpers.user_path(conn, :show, logged_in_user))
       |> halt()
     end
 

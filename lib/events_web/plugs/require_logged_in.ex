@@ -10,10 +10,12 @@ defmodule EventsWeb.Plugs.RequireLoggedIn do
     if conn.assigns[:user] do
       conn
     else
-      # From Tuck notes 0302 require_user.ex
+      # Some of it from Tuck notes 0302 require_user.ex
+      # Get the event in order to redirect back this event
+
       conn
       |> Phoenix.Controller.put_flash(:error, "Sorry you need to be logged in")
-      |> Phoenix.Controller.redirect(to: EventsWeb.Router.Helpers.page_path(conn, :index))
+      |> Phoenix.Controller.redirect(to: EventsWeb.Router.Helpers.page_path(conn, :login))
       |> halt()
     end
 

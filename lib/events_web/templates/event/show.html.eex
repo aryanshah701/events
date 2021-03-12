@@ -1,22 +1,140 @@
+<div id="flash-container">
+</div>
 <h1><%= @event.name %></h1>
 
-<ul>
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <div class="row mb-2">
+        <div class="col">
+          <strong>Date:</strong>
+          <%= @event.date %>
+        </div>
+      </div>
+      <div class="row mb-2">
+        <div class="col">
+            <strong>Description:</strong>
+            <%= @event.description %>
+        </div>
+      </div>
 
-  <li>
-    <strong>Date:</strong>
-    <%= @event.date %>
-  </li>
-
-  <li>
-    <strong>Description:</strong>
-    <%= @event.description %>
-  </li>
-
-</ul>
-
-<%= if @conn.assigns[:user].id == @event.user_id do %>
-  <span><%= link "Edit Event", to: Routes.event_path(@conn, :edit, @event) %></span>
-<% end %>
+      <div class="row">
+        <div class="col-9">
+          <div class="row">
+            <button style="font-size:0.75rem;" type="button" class="btn btn-primary col m-2">
+              <p class="m-0 p-0">Invites</p>
+              <span id="invites" class="badge badge-pill bg-secondary m-1">
+                <%=@event.num_invites%>
+              </span>
+            </button>
+            <button style="font-size:0.75rem; display: block;" type="button" class="btn btn-success col m-2">
+              <p class="m-0 p-0">Yes</p> 
+              <span id="yes" class="badge badge-pill bg-secondary m-1">
+                <%=@event.num_yes%>
+              </span>
+            </button>
+            <button style="font-size:0.75rem;" type="button" class="btn btn-danger col m-2">
+              <p class="m-0 p-0">No</p>
+              <span id="no" class="badge badge-pill bg-secondary m-1">
+                <%=@event.num_no%>
+              </span>
+            </button>
+            <button style="font-size:0.75rem;" type="button" class="btn btn-info col m-2">
+              <p class="m-0 p-0">Maybe</p>
+              <span id="maybe" class="badge badge-pill bg-secondary m-1">
+                <%=@event.num_maybe%>
+              </span>
+            </button>
+            <button style="font-size:0.75rem;" type="button" class="btn btn-dark col m-2 fs-6">
+              <p class="m-0 p-0">No Response</p>
+              <span id="no-response" class="badge badge-pill bg-secondary m-1">
+                <%=@event.num_no_response%>
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <%= if invited_user?(@event.invites, @conn.assigns[:user]) do %>
+      <div class="row mt-5">
+        <div class="col-9">
+          <div class="row text-center">
+            <div class="col">
+              Your Response
+            </div>
+          </div>
+          <div class="row">
+            <button id="response-yes" 
+                    data-event-id="<%=@event.id%>" 
+                    style="font-size:0.75rem;" 
+                    type="button" 
+                    class="btn btn-primary col m-2">
+              Yes
+            </button>
+            <button id="response-no" 
+                    data-event-id="<%=@event.id%>" 
+                    style="font-size:0.75rem; display: block;" 
+                    type="button" 
+                    class="btn btn-success col m-2">
+              No
+            </button>
+            <button id="response-maybe" 
+                    data-event-id="<%=@event.id%>" 
+                    style="font-size:0.75rem;" 
+                    type="button" 
+                    class="btn btn-danger col m-2">
+              Maybe
+            </button>
+          </div>
+        </div>
+      </div>
+      <% end %>
+      <%= if @conn.assigns[:user].id == @event.user_id do %>
+        <div class="row">
+          <div class="col-4 mt-4">
+            <div class="mb-3">
+              <label for="invite-email" class="form-label">Invite Someone!</label>
+              <input id="invite-email" type="email" class="form-control" placeholder="name@example.com">
+            </div>
+            <button class="btn btn-primary" 
+                    id="invite" 
+                    data-event-id="<%=@event.id%>">
+                  Invite
+            </button>
+          </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col">
+            <h5>Invite Link: <span class="badge badge-info">localhost://events/<%=@event.id%></span></h5>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-2 mt-4">
+            <%= link "Edit Event", to: Routes.event_path(@conn, :edit, @event) %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+    <div class="col-4">
+      <div class="row">
+        <div class="col">
+          <h3>Invites</h3>
+        </div>
+      </div>
+      <div id="invite-list">
+        <%= for invite <- @event.invites do %>
+          <div class="row invite-in-list" data-invite-email="<%=invite.user_email%>">
+            <div class="col-6">
+              <%=invite.user_email%>
+            </div>
+            <div class="col-6 response">
+              <%=response_to_string(invite.response) %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
 
 <h2>Comments</h2>
 <%= render(
@@ -32,14 +150,18 @@
       <td><%= comment.content %></td>
       <td><%= get_user_name(comment.user_id) %></td>
       <%= if comment.user_id == @conn.assigns[:user].id || @event.user_id == @conn.assigns[:user].id do %>
-        <td><span><%= link "Edit", to: Routes.comment_path(@conn, :edit, comment) %></span></td>
+        <td><span><%= link "Delete", to: Routes.comment_path(@conn, :delete, comment), 
+                      method: :delete, data: [confirm: "Are you sure?"] %></span></td>
       <% end %>
 
       <%= if comment.user_id == @conn.assigns[:user].id do %>
-        <td><span><%= link "Delete", to: Routes.comment_path(@conn, :delete, comment), method: :delete, data: [confirm: "Are you sure?"] %></span></td>
+        <td><span><%= link "Edit", to: Routes.comment_path(@conn, :edit, comment) %></span></td>
       <% end %>
     </tr>
 <% end %>
 </table>
 
 <span><%= link "Back", to: Routes.page_path(@conn, :index) %></span>
+
+<script>
+</script>

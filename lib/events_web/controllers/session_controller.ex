@@ -11,16 +11,14 @@ defmodule EventsWeb.SessionController do
 
     if user do
       conn = put_session(conn, :user_id, user.id)
-      IO.puts "User"
-      IO.puts user.id
       conn
       |> put_flash(:info, "Logged in Sucessfully!")
-      |> redirect(to: Routes.page_path(conn, :index))
+      |> redirect(to: Routes.user_path(conn, :show, user))
 
     else
       conn
       |> put_flash(:error, "Invalid email")
-      |> redirect(to: Routes.page_path(conn, :index))
+      |> redirect(to: Routes.page_path(conn, :login))
     end
   end
 

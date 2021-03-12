@@ -12,11 +12,28 @@ defmodule EventsWeb.InviteController do
   end
 
   def create(conn, %{"invite" => invite_params}) do
-    with {:ok, %Invite{} = invite} <- Invites.create_invite(invite_params) do
-      conn
-      |> put_status(:created)
-      |> put_resp_header("location", Routes.invite_path(conn, :show, invite))
-      |> render("show.json", invite: invite)
+    # Add the user email if it isn't part of the request
+    if !invite_params["user_email"] do
+      invite_params = Map.put(invite_params, "user_email", conn.assigns[:current_user].email)
+      IO.inspect invite_params
+      
+      with {:ok, %Invite{} = invite} <- Invites.create_invite(invite_params) do
+        invite = Invites.load_invite(invite)
+
+        conn
+        |> put_status(:created)
+        |> put_resp_header("location", Routes.invite_path(conn, :show, invite))
+        |> render("show.json", invite: invite)
+      end
+    else
+      with {:ok, %Invite{} = invite} <- Invites.create_invite(invite_params) do
+        invite = Invites.load_invite(invite)
+
+        conn
+        |> put_status(:created)
+        |> put_resp_header("location", Routes.invite_path(conn, :show, invite))
+        |> render("show.json", invite: invite)
+      end
     end
   end
 

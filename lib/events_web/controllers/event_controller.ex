@@ -51,6 +51,7 @@ defmodule EventsWeb.EventController do
 
   def show(conn, %{"id" => id}) do
     event = UserEvents.get_event!(id)
+    event = UserEvents.load_stats(event)
 
     # Creation of a comment change set taken from Tuck notes 0302 post_controller.ex
     comment = %Events.Comments.Comment{
