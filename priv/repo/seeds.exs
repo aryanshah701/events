@@ -16,15 +16,15 @@ alias Events.UserEvents.Event
 
 # Seeding users
 user1 = Repo.insert!(%User{
-  name: "user1", email: "user1@gmail.com"
+  name: "user1", email: "user1@gmail.com", photo_hash: ""
 })
 
 user2 = Repo.insert!(%User{
-  name: "user2", email: "user2@gmail.com"
+  name: "user2", email: "user2@gmail.com", photo_hash: ""
 })
 
 user3 = Repo.insert!(%User{
-  name: "user3", email: "user3@gmail.com"
+  name: "user3", email: "user3@gmail.com", photo_hash: ""
 })
 
 # Creating seed datetimes

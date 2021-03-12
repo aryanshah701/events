@@ -1,4 +1,4 @@
-<%= form_for @changeset, @action, fn f -> %>
+<%= form_for @changeset, @action, [multipart: true], fn f -> %>
   <div class="container w-50">
     <%= if @changeset.action do %>
       <div class="alert alert-danger">
@@ -19,6 +19,11 @@
     </div>
     <%= error_tag f, :name %>
 
+    <div class="mb-3">
+      <%= label f, :photo, for: "photo", class: "form-label" %>
+      <%= file_input f, :photo, id: "photo", class: "form-control" %>
+    </div>
+    <%= error_tag f, :photo %>
 
     <div class="mb-3">
       <%= submit "Register/Update" , type: "submit", class: "btn btn-primary" %>
