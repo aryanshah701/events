@@ -21,12 +21,12 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-9 col-md-12">
+        <div class="col-9 col-lg-12">
           <h3>Your Hosted Events</h3>
         </div>
       </div> 
       <div class="row">
-        <div class="col-9">
+        <div class="col-9 col-lg-12">
           <ul class="list-group">
             <%= for event <- @user.events do %>
               <li class="list-group-item">
@@ -34,6 +34,11 @@
               </li>
             <% end %>
           </ul>   
+        </div>
+      </div>
+      <div class="row my-3">
+        <div class="col-12">
+          <%= link "Create A New Event", to: Routes.event_path(@conn, :new) %>
         </div>
       </div>
     </div>

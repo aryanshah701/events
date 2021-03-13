@@ -112,6 +112,7 @@
             <%= link "Edit Event", to: Routes.event_path(@conn, :edit, @event) %>
           </div>
         </div>
+        
       <% end %>
     </div>
     <div class="col-4">

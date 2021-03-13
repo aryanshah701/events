@@ -12,15 +12,6 @@
           <p class="mb-2 fs-6 text-muted"><%= event.date %></p>
           <p class="card-text"><%= event.description %></p>
           <span class="mx-1"><%= link "Show", to: Routes.event_path(@conn, :show, event) %></span>
-          <span class="mx-1"><%= link "Edit", to: Routes.event_path(@conn, :edit, event) %></span>
-          <span class="mx-1">
-            <%= 
-              link "Delete", 
-              to: Routes.event_path(@conn, :delete, event), 
-              method: :delete, 
-              data: [confirm: "Are you sure?"] 
-            %>
-          </span>
         </div>
       </div>
     <% end %>

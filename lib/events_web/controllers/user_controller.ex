@@ -28,26 +28,42 @@ defmodule EventsWeb.UserController do
     # Following 3 lines from Tuck Notes 0309 post_controller.ex
     photo = user_params["photo"]
 
-    # Ensure that the photo ends with jpg, png, or gif
-    if Events.Photos.is_valid_photo(photo) do
-       conn
-       |> put_flash(:error, "Please make sure your photo is a jpg, png, or gif") 
-       |> redirect(to: Routes.user_path(conn, :new))
-    end
-
-    {:ok, hash} = Photos.save_photo(photo.filename, photo.path)
-    user_params = Map.put(user_params, "photo_hash", hash)
-    
-    # Create the user and send him/her to login page
-    case Users.create_user(user_params) do
-      {:ok, user} ->
-        conn = put_session(conn, :user_id, user.id)
+    # If the user has decided to put in a photo
+    if photo do
+      # Ensure that the photo ends with jpg, png, or gif
+      if Events.Photos.is_valid_photo(photo) do
         conn
-        |> put_flash(:info, "You have been registered!")
-        |> redirect(to: redirect_uri || Routes.user_path(conn, :show, user))
+        |> put_flash(:error, "Please make sure your photo is a jpg, png, or gif") 
+        |> redirect(to: Routes.user_path(conn, :new))
+      end
 
-      {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "new.html", changeset: changeset)
+      {:ok, hash} = Photos.save_photo(photo.filename, photo.path)
+      user_params = Map.put(user_params, "photo_hash", hash)
+      
+      # Create the user and send him/her to login page
+      case Users.create_user(user_params) do
+        {:ok, user} ->
+          conn = put_session(conn, :user_id, user.id)
+          conn
+          |> put_flash(:info, "You have been registered!")
+          |> redirect(to: redirect_uri || Routes.user_path(conn, :show, user))
+
+        {:error, %Ecto.Changeset{} = changeset} ->
+          render(conn, "new.html", changeset: changeset)
+      end
+    else
+      # Create the user and send him/her to login page(without photo)
+      user_params = Map.put(user_params, "photo_hash", "")
+      case Users.create_user(user_params) do
+        {:ok, user} ->
+          conn = put_session(conn, :user_id, user.id)
+          conn
+          |> put_flash(:info, "You have been registered!")
+          |> redirect(to: redirect_uri || Routes.user_path(conn, :show, user))
+
+        {:error, %Ecto.Changeset{} = changeset} ->
+          render(conn, "new.html", changeset: changeset)
+      end
     end
   end
 
@@ -69,10 +85,17 @@ defmodule EventsWeb.UserController do
   # Taken from Tuck notes 0309 post_controller.ex
   def photo(conn, %{"id" => _id}) do
     user = conn.assigns[:user]
-    {:ok, _name, data} = Photos.load_photo(user.photo_hash)
-    conn
-    |> put_resp_content_type("image/jpeg")
-    |> send_resp(200, data)
+    # If the user has a photo
+    if user.photo_hash != "" do
+      {:ok, _name, data} = Photos.load_photo(user.photo_hash)
+      conn
+      |> put_resp_content_type("image/jpeg")
+      |> send_resp(200, data)
+    else
+      conn
+      |> put_resp_content_type("image/jpeg")
+      |> send_resp(200, "")
+    end
   end
 
   def edit(conn, %{"id" => id}) do
@@ -100,24 +123,37 @@ defmodule EventsWeb.UserController do
       |> halt()
     else
       photo = user_params["photo"]
-       # Ensure that the photo ends with jpg, png, or gif
-      if Events.Photos.is_valid_photo(photo) do
-        conn
-        |> put_flash(:error, "Please make sure your photo is a jpg, png, or gif") 
-        |> redirect(to: Routes.user_path(conn, :show, user))
-      end
 
-      {:ok, hash} = Photos.save_photo(photo.filename, photo.path)
-      user_params = Map.put(user_params, "photo_hash", hash)
-
-      case Users.update_user(user, user_params) do
-        {:ok, user} ->
+      if photo do
+        # Ensure that the photo ends with jpg, png, or gif
+        if Events.Photos.is_valid_photo(photo) do
           conn
-          |> put_flash(:info, "User updated successfully.")
+          |> put_flash(:error, "Please make sure your photo is a jpg, png, or gif") 
           |> redirect(to: Routes.user_path(conn, :show, user))
+        end
 
-        {:error, %Ecto.Changeset{} = changeset} ->
-          render(conn, "edit.html", user: user, changeset: changeset)
+        {:ok, hash} = Photos.save_photo(photo.filename, photo.path)
+        user_params = Map.put(user_params, "photo_hash", hash)
+
+        case Users.update_user(user, user_params) do
+          {:ok, user} ->
+            conn
+            |> put_flash(:info, "User updated successfully.")
+            |> redirect(to: Routes.user_path(conn, :show, user))
+
+          {:error, %Ecto.Changeset{} = changeset} ->
+            render(conn, "edit.html", user: user, changeset: changeset)
+        end
+      else
+        case Users.update_user(user, user_params) do
+          {:ok, user} ->
+            conn
+            |> put_flash(:info, "User updated successfully.")
+            |> redirect(to: Routes.user_path(conn, :show, user))
+
+          {:error, %Ecto.Changeset{} = changeset} ->
+            render(conn, "edit.html", user: user, changeset: changeset)
+        end
       end
     end
   end
