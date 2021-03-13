@@ -1,5 +1,5 @@
 // Design for this file was inspired by Tuck notes 0309 voting.js
-import $ from "jQuery";
+import $ from "jquery";
 
 // Update num invites and no responses on the screen
 function update_invites(resp, status, _xhr) {
