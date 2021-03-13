@@ -6,6 +6,7 @@ defmodule EventsWeb.UserController do
   alias Events.Photos
   alias EventsWeb.Plugs
 
+  plug Plugs.RequireNotLoggedIn, "en" when action in [:new, :create]
   plug Plugs.RequireLoggedIn, "en" when action in [:index, :show, :edit, :update, :delete]
   plug Plugs.RequireUserOwner, "en" when action in [:show, :edit, :update, :delete]
 
@@ -103,9 +104,9 @@ defmodule EventsWeb.UserController do
       if Events.Photos.is_valid_photo(photo) do
         conn
         |> put_flash(:error, "Please make sure your photo is a jpg, png, or gif") 
-        |> redirect(to: Routes.user_path(conn, :new))
+        |> redirect(to: Routes.user_path(conn, :show, user))
       end
-      
+
       {:ok, hash} = Photos.save_photo(photo.filename, photo.path)
       user_params = Map.put(user_params, "photo_hash", hash)
 
