@@ -1,20 +1,39 @@
 <div class="container w-50">
   <div class="row mb-1">
     <div class="col">
-      <%= form_for @conn, Routes.session_path(@conn, :create), fn f -> %>
-        <div class="mb-3">
-          <label for="exampleInputEmail1" class="form-label">Email address</label>
-          <%= text_input f, :email, placeholder: "email", class: "form-control", id: "exampleInputEmail1" %>
-        </div>
-        <div class="mb-3">
-          <%= submit "Log In" , type: "submit", class: "btn btn-primary" %>
-        </div>
+      <% redirect_uri = get_redirect_uri(@conn) %>
+      <%= if redirect_uri do %>
+        <%= form_for @conn, Routes.session_path(@conn, :create, redirect: redirect_uri), fn f -> %>
+          <div class="mb-3">
+            <label for="exampleInputEmail1" class="form-label">Email address</label>
+            <%= text_input f, :email, placeholder: "email", class: "form-control", id: "exampleInputEmail1" %>
+          </div>
+          <div class="mb-3">
+            <%= submit "Log In" , type: "submit", class: "btn btn-primary" %>
+          </div>
+        <% end %>
+          
+      <% else %>
+        <%= form_for @conn, Routes.session_path(@conn, :create), fn f -> %>
+          <div class="mb-3">
+            <label for="exampleInputEmail1" class="form-label">Email address</label>
+            <%= text_input f, :email, placeholder: "email", class: "form-control", id: "exampleInputEmail1" %>
+          </div>
+          <div class="mb-3">
+            <%= submit "Log In" , type: "submit", class: "btn btn-primary" %>
+          </div>
+        <% end %>
       <% end %>
     </div>
   </div>
   <div class="row">
     <div class="col">
-      <%= button("Register", type: "submit", class: "btn btn-primary", to: Routes.user_path(@conn, :new), method: "get") %>
+      <%= if redirect_uri do %>
+        <%= link("Register", class: "btn btn-primary", to: Routes.user_path(@conn, :new, redirect: redirect_uri)) %>
+      <% else %>
+        <%= link("Register", class: "btn btn-primary", to: Routes.user_path(@conn, :new, redirect: redirect_uri), method: "get") %>
+      <% end %>
+
     </div>
   </div>
 </div>

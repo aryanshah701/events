@@ -1,3 +1,7 @@
 <h1>Register</h1>
-
-<%= render "form.html", Map.put(assigns, :action, Routes.user_path(@conn, :create)) %>
+<% redirect_uri = get_redirect_uri(@conn) %>
+<%= if redirect_uri do %>
+  <%= render "form.html", Map.put(assigns, :action, Routes.user_path(@conn, :create, redirect: redirect_uri)) %>
+<% else %>
+  <%= render "form.html", Map.put(assigns, :action, Routes.user_path(@conn, :create)) %>
+<% end %>

@@ -24,7 +24,6 @@ defmodule EventsWeb.Plugs.AddUser do
       |> assign(:user, user)
       |> assign(:user_token, token)
     else
-      IO.puts "NO USER"
       assign(conn, :user, nil)
     end
 

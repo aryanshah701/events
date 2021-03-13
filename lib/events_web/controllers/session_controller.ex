@@ -8,18 +8,25 @@ defmodule EventsWeb.SessionController do
   def create(conn, %{"email" => email}) do
     # If user email exists then log in, else put error flash
     user = Users.get_user_by_email(email)
+    
+    # Get the redirect uri if one exists
+    redirect_uri = EventsWeb.Helpers.get_redirect_uri(conn)
 
+    IO.puts "Session"
+    IO.inspect redirect_uri
+    
     if user do
       conn = put_session(conn, :user_id, user.id)
       conn
       |> put_flash(:info, "Logged in Sucessfully!")
-      |> redirect(to: Routes.user_path(conn, :show, user))
+      |> redirect(to: redirect_uri || Routes.user_path(conn, :show, user))
 
     else
       conn
       |> put_flash(:error, "Invalid email")
       |> redirect(to: Routes.page_path(conn, :login))
     end
+      
   end
 
   # Logs the user out

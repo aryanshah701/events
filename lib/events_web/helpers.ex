@@ -22,4 +22,13 @@ defmodule EventsWeb.Helpers do
     user_email = user.email
     Enum.any?(invites, fn invite -> invite.user_email == user_email end)
   end
+
+  def get_redirect_uri(conn) do
+    if Map.has_key?(conn.query_params, "redirect") do
+      conn.query_params["redirect"]
+    else
+      nil
+    end
+  end
+
 end

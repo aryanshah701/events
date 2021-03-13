@@ -11,11 +11,12 @@ defmodule EventsWeb.Plugs.RequireLoggedIn do
       conn
     else
       # Some of it from Tuck notes 0302 require_user.ex
-      # Get the event in order to redirect back this event
+      # Get the redirect uri before redirect the user to the login page
+      redirect_uri = conn.request_path
 
       conn
       |> Phoenix.Controller.put_flash(:error, "Sorry you need to be logged in")
-      |> Phoenix.Controller.redirect(to: EventsWeb.Router.Helpers.page_path(conn, :login))
+      |> Phoenix.Controller.redirect(to: EventsWeb.Router.Helpers.page_path(conn, :login, "redirect": redirect_uri))
       |> halt()
     end
 

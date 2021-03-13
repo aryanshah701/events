@@ -9,6 +9,34 @@
       <% src = Routes.user_path(@conn, :photo, @user) %>
       <img src="<%=src%>" class="w-10 mw-10 img-thumbnail" alt="...">
     </div>
+    <div class="col">
+      <div class="row">
+        <div class="col">
+          <p>Registered Email: <%= @user.email%></p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <p>Number of Hosted Events: <%= Enum.count(@user.events)%></p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <h3>Your Hosted Events</h3>
+        </div>
+      </div> 
+      <div class="row">
+        <div class="col">
+          <ul class="list-group">
+            <%= for event <- @user.events do %>
+              <li class="list-group-item">
+                <span><%= link event.name, to: Routes.event_path(@conn, :show, event) %></span>
+              </li>
+            <% end %>
+          </ul>   
+        </div>
+      </div>
+    </div>
   </div>
   <div class="row my-4">
     <div class="col">

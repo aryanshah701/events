@@ -4,6 +4,10 @@ defmodule EventsWeb.UserController do
   alias Events.Users
   alias Events.Users.User
   alias Events.Photos
+  alias EventsWeb.Plugs
+
+  plug Plugs.RequireLoggedIn, "en" when action in [:index, :show, :edit, :update, :delete]
+  plug Plugs.RequireUserOwner, "en" when action in [:show, :edit, :update, :delete]
 
   def index(conn, _params) do
     users = Users.list_users()
@@ -16,6 +20,9 @@ defmodule EventsWeb.UserController do
   end
 
   def create(conn, %{"user" => user_params}) do
+    # Get the redirect uri(if it exists)
+    redirect_uri = EventsWeb.Helpers.get_redirect_uri(conn)
+
     # Add the photo_hash to the user_params
     # Following 3 lines from Tuck Notes 0309 post_controller.ex
     photo = user_params["photo"]
@@ -24,10 +31,11 @@ defmodule EventsWeb.UserController do
     
     # Create the user and send him/her to login page
     case Users.create_user(user_params) do
-      {:ok, _user} ->
+      {:ok, user} ->
+        conn = put_session(conn, :user_id, user.id)
         conn
         |> put_flash(:info, "You have been registered!")
-        |> redirect(to: Routes.page_path(conn, :login))
+        |> redirect(to: redirect_uri || Routes.user_path(conn, :show, user))
 
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "new.html", changeset: changeset)
@@ -35,8 +43,17 @@ defmodule EventsWeb.UserController do
   end
 
   def show(conn, %{"id" => id}) do
-    user = Users.get_user!(id)
-    render(conn, "show.html", user: user)
+    logged_in_user_id = Integer.to_string(conn.assigns[:user].id)
+
+    if id != logged_in_user_id do
+      conn
+      |> put_flash(:error, "Sorry you can't access someone else's user details")
+      |> redirect(to: EventsWeb.Router.Helpers.user_path(conn, :show, logged_in_user_id))
+      |> halt()
+    else
+      user = Users.get_user!(id)
+      render(conn, "show.html", user: user)
+    end
   end
 
   # Responds with the photo of the given user
@@ -50,35 +67,60 @@ defmodule EventsWeb.UserController do
   end
 
   def edit(conn, %{"id" => id}) do
-    user = Users.get_user!(id)
-    changeset = Users.change_user(user)
-    render(conn, "edit.html", user: user, changeset: changeset)
+    logged_in_user_id =  Integer.to_string(conn.assigns[:user].id)
+    if id != logged_in_user_id do
+      conn
+      |> put_flash(:error, "Sorry you can't edit another user")
+      |> redirect(to: EventsWeb.Router.Helpers.user_path(conn, :show, logged_in_user_id))
+      |> halt()
+    else
+      user = Users.get_user!(id)
+      changeset = Users.change_user(user)
+      render(conn, "edit.html", user: user, changeset: changeset)
+    end
   end
 
   def update(conn, %{"id" => id, "user" => user_params}) do
     user = Users.get_user!(id)
+    logged_in_user_id = Integer.to_string(conn.assigns[:user].id)
 
-    photo = user_params["photo"]
-    {:ok, hash} = Photos.save_photo(photo.filename, photo.path)
-    user_params = Map.put(user_params, "photo_hash", hash)
+    if id != logged_in_user_id do
+      conn
+      |> put_flash(:error, "Sorry you can't edit another user")
+      |> redirect(to: EventsWeb.Router.Helpers.user_path(conn, :show, logged_in_user_id))
+      |> halt()
+    else
+      photo = user_params["photo"]
+      {:ok, hash} = Photos.save_photo(photo.filename, photo.path)
+      user_params = Map.put(user_params, "photo_hash", hash)
 
-    case Users.update_user(user, user_params) do
-      {:ok, user} ->
-        conn
-        |> put_flash(:info, "User updated successfully.")
-        |> redirect(to: Routes.user_path(conn, :show, user))
+      case Users.update_user(user, user_params) do
+        {:ok, user} ->
+          conn
+          |> put_flash(:info, "User updated successfully.")
+          |> redirect(to: Routes.user_path(conn, :show, user))
 
-      {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "edit.html", user: user, changeset: changeset)
+        {:error, %Ecto.Changeset{} = changeset} ->
+          render(conn, "edit.html", user: user, changeset: changeset)
+      end
     end
   end
 
   def delete(conn, %{"id" => id}) do
     user = Users.get_user!(id)
-    {:ok, _user} = Users.delete_user(user)
+    logged_in_user_id = Integer.to_string(conn.assigns[:user].id)
+    
+    if id != logged_in_user_id do
+      conn
+      |> put_flash(:error, "Sorry you can't edit another user")
+      |> redirect(to: EventsWeb.Router.Helpers.user_path(conn, :show, logged_in_user_id))
+      |> halt()
+    else
+      {:ok, _user} = Users.delete_user(user)
 
-    conn
-    |> put_flash(:info, "User deleted successfully.")
-    |> redirect(to: Routes.page_path(conn, :index))
+      conn
+      |> put_flash(:info, "User deleted successfully.")
+      |> redirect(to: Routes.page_path(conn, :index))
+    end
   end
 end
