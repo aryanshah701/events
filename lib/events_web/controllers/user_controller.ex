@@ -26,6 +26,14 @@ defmodule EventsWeb.UserController do
     # Add the photo_hash to the user_params
     # Following 3 lines from Tuck Notes 0309 post_controller.ex
     photo = user_params["photo"]
+
+    # Ensure that the photo ends with jpg, png, or gif
+    if Events.Photos.is_valid_photo(photo) do
+       conn
+       |> put_flash(:error, "Please make sure your photo is a jpg, png, or gif") 
+       |> redirect(to: Routes.user_path(conn, :new))
+    end
+
     {:ok, hash} = Photos.save_photo(photo.filename, photo.path)
     user_params = Map.put(user_params, "photo_hash", hash)
     
@@ -91,6 +99,13 @@ defmodule EventsWeb.UserController do
       |> halt()
     else
       photo = user_params["photo"]
+       # Ensure that the photo ends with jpg, png, or gif
+      if Events.Photos.is_valid_photo(photo) do
+        conn
+        |> put_flash(:error, "Please make sure your photo is a jpg, png, or gif") 
+        |> redirect(to: Routes.user_path(conn, :new))
+      end
+      
       {:ok, hash} = Photos.save_photo(photo.filename, photo.path)
       user_params = Map.put(user_params, "photo_hash", hash)
 

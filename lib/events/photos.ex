@@ -2,7 +2,14 @@
 # The file can be found at 
 # https://github.com/NatTuck/scratch-2021-01/blob/master/4550/0309/photo_blog/lib/photo_blog/photos.ex
 defmodule Events.Photos do
-  
+  # Is Valid Photo
+  def is_valid_photo(photo) do
+    IO.inspect photo
+    !String.ends_with?(photo.filename, "jpg") && 
+      !String.ends_with?(photo.filename, "png") && 
+      !String.ends_with?(photo.filename, "gif")
+  end
+
   # Saves the photo given the name and path of the photo file
   def save_photo(name, path) do
     data = File.read!(path)
